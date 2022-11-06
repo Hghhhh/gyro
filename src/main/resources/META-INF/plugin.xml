@@ -1,0 +1,58 @@
+<!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
+<idea-plugin>
+    <!-- Unique identifier of the plugin. It should be FQN. It cannot be changed between the plugin versions. -->
+    <id>com.goldenBell.gyro</id>
+
+    <!-- Public plugin name should be written in Title Case.
+         Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-name -->
+    <name>Gyro</name>
+
+    <!-- A displayed Vendor name or Organization ID displayed on the Plugins Page. -->
+    <vendor email="1025233032@qq.com" url="https://www.gyrorun.com">HGH</vendor>
+
+    <!-- Description of the plugin displayed on the Plugin Page and IDE Plugin Manager.
+         Simple HTML elements (text formatting, paragraphs, and lists) can be added inside of <![CDATA[ ]]> tag.
+         Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-description -->
+    <description><![CDATA[
+    Gryo(陀螺)-让你的单测一直运转。第一次运行Gyro Debug的时候需要warm up，比如启动Spring容器等<br>
+    之后再次运行Gyro Debug会复用之前启动过的容器，极大地节省你的运行时间。<br>
+    可配合Jrebel插件使用，安装Jrebel插件之后，会自动使用Jrebel的热部署能力。
+  ]]></description>
+
+    <!-- Product and plugin compatibility requirements.
+         Read more: https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
+    <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.java</depends>
+
+    <!-- Extension points defined by the plugin.
+         Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
+    <actions>
+        <action
+                id="RunDashboard.GyroDebugAction"
+                class="com.goldenbell.gyro.executor.GyroDebugAction"
+                text="Gyro Debug"
+                description="GyroDebugAction" keymap="$default" icon="/icons/toolWindowGyroDebugger.svg" use-shortcut-of="GyroDebugClassAction">
+            <add-to-group group-id="RunDashboardContentToolbar"/>
+        </action>
+        <action
+                id="GyroDebugClassAction"
+                class="com.goldenbell.gyro.executor.GyroDebugClassAction"
+                text="Gyro Debug"
+                description="GyroDebugAction" keymap="$default" icon="/icons/toolWindowGyroDebugger.svg">
+            <keyboard-shortcut first-keystroke="control G" keymap="$default" replace-all="true"/>
+        </action>
+    </actions>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <executor id="GyroDebug" implementation="com.goldenbell.gyro.executor.GyroDebuggerExecutor"/>
+        <programRunner id="GyroDebuggerRunner" implementation="com.goldenbell.gyro.programrunner.GyroDebuggerRunner" order="first"/>
+        <notificationGroup id="Gyro debugger messages" displayType="TOOL_WINDOW" toolWindowId="GyroDebug" isLogByDefault="true"/>
+        <applicationService serviceImplementation="com.goldenbell.gyro.settings.GyroSettingsState"/>
+        <projectConfigurable instance="com.goldenbell.gyro.settings.GyroSettingsConfigurable"
+                             groupId="tools"
+                             nonDefaultProject="true"
+                             id="Gyro Settings"
+                             displayName="Gyro Settings">
+        </projectConfigurable>
+    </extensions>
+</idea-plugin>
