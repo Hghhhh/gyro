@@ -46,7 +46,6 @@ public class GyroTestStarter {
             watchService = FileSystems.getDefault().newWatchService();
             path.register(watchService, new WatchEvent.Kind[] {StandardWatchEventKinds.ENTRY_MODIFY}, SensitivityWatchEventModifier.HIGH);
             while (true) {
-                Thread.sleep(50L);
                 WatchKey watchKey = watchService.take();
                 Iterator events = watchKey.pollEvents().iterator();
 
