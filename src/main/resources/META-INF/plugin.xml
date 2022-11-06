@@ -7,6 +7,8 @@
          Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-name -->
     <name>Gyro</name>
 
+    <idea-version since-build="*"/>
+
     <!-- A displayed Vendor name or Organization ID displayed on the Plugins Page. -->
     <vendor email="1025233032@qq.com" url="https://www.gyrorun.com">HGH</vendor>
 
