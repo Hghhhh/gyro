@@ -5,6 +5,7 @@ import com.sun.nio.file.SensitivityWatchEventModifier;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
@@ -49,6 +50,7 @@ public class GyroTestStarter {
                 Iterator events = watchKey.pollEvents().iterator();
 
                 while(events.hasNext()) {
+                    events.next();
                     String[] params = Files.readAllLines(file.toPath(), StandardCharsets.UTF_8)
                             .stream().filter((line) -> line!=null && !line.isEmpty()).toArray(String[]::new);
                     start(className, params);
@@ -56,14 +58,12 @@ public class GyroTestStarter {
                 watchKey.reset();
             }
         } catch (Throwable e) {
-            log("some errors happened, please restart");
             throw new RuntimeException(e);
         } finally {
             if (watchService != null) {
                 try {
                     watchService.close();
                 } catch (IOException e) {
-                    log("some errors happened, please restart");
                     throw new RuntimeException(e);
                 }
             }
@@ -74,7 +74,10 @@ public class GyroTestStarter {
         try {
             Method method = Class.forName(className).getMethod("main", String[].class);
             method.invoke(null, new Object[]{args});
-        } catch (Throwable e) {
+        } catch (ExitException | InvocationTargetException e) {
+            //ignore
+        } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException e) {
+            log("some errors happened, please restart");
             throw new RuntimeException(e);
         }
     }
@@ -87,13 +90,13 @@ public class GyroTestStarter {
         public final int status;
 
         public ExitException(int status) {
-            super("There is no escape!");
+            super("not exit");
             this.status = status;
         }
     }
 
     private static class NoExitSecurityManager extends SecurityManager {
-        private NoExitSecurityManager() {}
+        public NoExitSecurityManager() {}
 
         public void checkPermission(Permission permission) {}
 
@@ -101,6 +104,7 @@ public class GyroTestStarter {
 
         public void checkExit(int status) {
             super.checkExit(status);
+            //prevent exit
             throw new ExitException(status);
         }
     }

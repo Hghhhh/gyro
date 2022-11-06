@@ -14,6 +14,6 @@ public class CommonConstants {
 
     public static final String TEST_STARTER_CLASS_NAME = "com.goldenbell.gyro.starter.GyroTestStarter";
 
-    public static final long KEEP_ALIVE_ALLOW_TIME = 5000L;
+    public static final long KEEP_ALIVE_ALLOW_TIME = 10000L;
 
 }

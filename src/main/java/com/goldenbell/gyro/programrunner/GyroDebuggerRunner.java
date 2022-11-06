@@ -13,6 +13,8 @@ import com.intellij.execution.target.TargetEnvironmentAwareRunProfileState;
 import com.intellij.execution.ui.RunContentDescriptor;
 import com.intellij.openapi.application.PathManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.ThrowableComputable;
+import com.intellij.util.SlowOperations;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.concurrency.AsyncPromise;
 import org.jetbrains.concurrency.Promise;
@@ -35,14 +37,21 @@ public class GyroDebuggerRunner extends GenericDebuggerRunner {
         return executorId.equals(RUNNER_ID) && profile instanceof ModuleRunProfile && !(profile instanceof RunConfigurationWithSuppressedDefaultDebugAction);
     }
 
-    private boolean doPreExecute(@NotNull RunProfileState state, @NotNull ExecutionEnvironment env) throws IOException, ExecutionException {
+    private boolean doPreExecute(@NotNull RunProfileState state, @NotNull ExecutionEnvironment env) throws Throwable {
         Project project = env.getProject();
         File tempFile = FileUtil.getTempFile(project);
         File keepAliveFile = FileUtil.getKeepAliveFile(project);
         boolean wasRun = tempFile.exists() && KeepAliveUtil.isAlive(keepAliveFile);
         RunConfigurationBase runConfigurationBase = (RunConfigurationBase) env.getRunProfile();
         runConfigurationBase.setAllowRunningInParallel(true);
-        JavaParameters javaParameters = ((JavaCommandLine) state).getJavaParameters();
+        JavaParameters javaParameters =
+            SlowOperations.allowSlowOperations(new ThrowableComputable<JavaParameters, Throwable>() {
+
+                @Override
+                public JavaParameters compute() throws Throwable {
+                    return ((JavaCommandLine) state).getJavaParameters();
+                }
+            });
         javaParameters.getClassPath().addFirst(PathManager.getJarPathForClass(GyroTestStarter.class));
         FileUtil.writeToTempFile(project, javaParameters.getProgramParametersList().getArray());
         javaParameters.getProgramParametersList().add(tempFile.getAbsolutePath());
@@ -69,7 +78,7 @@ public class GyroDebuggerRunner extends GenericDebuggerRunner {
                 LogUtil.log(env.getProject(), "GYRO run!");
                 return super.doExecute(state, env);
             }
-        } catch (IOException | ExecutionException e) {
+        } catch (Throwable e) {
             LogUtil.error(env.getProject(), "some errors happened, please restart");
             throw new RuntimeException(e);
         }
@@ -88,7 +97,7 @@ public class GyroDebuggerRunner extends GenericDebuggerRunner {
                 LogUtil.log(env.getProject(), "GYRO run!");
                 return super.doExecuteAsync(state, env);
             }
-        } catch (IOException | ExecutionException e) {
+        } catch (Throwable e) {
             LogUtil.error(env.getProject(), "some errors happened, please restart");
             throw new RuntimeException(e);
         }
