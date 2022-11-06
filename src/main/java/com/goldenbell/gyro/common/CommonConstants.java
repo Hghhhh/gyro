@@ -6,11 +6,11 @@ public class CommonConstants {
 
     public static final String PLUGIN_TEMP_DIR = ".gyro";
 
-    public static final String PLUGIN_FILE_NAME = "default.gyro";
+    public static final String PLUGIN_FILE_NAME = "default.gy";
 
     public static final String KEEP_ALIVE_DIR = ".gyroKeepAlive";
 
-    public static final String KEEP_ALIVE_FILE_NAME = "keepAlive.gyro";
+    public static final String KEEP_ALIVE_FILE_NAME = "keepAlive.gy";
 
     public static final String TEST_STARTER_CLASS_NAME = "com.goldenbell.gyro.starter.GyroTestStarter";
 

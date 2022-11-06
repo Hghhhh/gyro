@@ -15,7 +15,7 @@ import java.util.Iterator;
 public class GyroTestStarter {
 
     public static void main(String[] args) {
-        log("###################[GYRO RUNNING]###################");
+        log("########################[GYRO RUNNING]########################");
         String className = args[args.length - 1];
         String tempFilePath = args[args.length - 2];
         File file = new File(tempFilePath);
@@ -34,8 +34,7 @@ public class GyroTestStarter {
         } catch (Throwable throwable) {
             log("trying alternative solution");
         }
-
-        String projectHashCode = file.getParent().split("\\.gryo")[1];
+        String projectHashCode = file.getParent().split("\\.gyro")[1];
         String tempDirPath = path.getParent().toString();
         KeepAliveUtil.keepAlive(tempDirPath, projectHashCode);
 

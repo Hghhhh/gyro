@@ -31,6 +31,7 @@ public class GyroDebuggerRunner extends GenericDebuggerRunner {
 
     @Override
     public boolean canRun(@NotNull String executorId, @NotNull RunProfile profile) {
+        //todo: now only support maven project, support gradle later
         return executorId.equals(RUNNER_ID) && profile instanceof ModuleRunProfile && !(profile instanceof RunConfigurationWithSuppressedDefaultDebugAction);
     }
 
@@ -52,7 +53,7 @@ public class GyroDebuggerRunner extends GenericDebuggerRunner {
         if (new File(jrebelAgentPath).exists()) {
             javaParameters.getVMParametersList().add("-agentpath:" + jrebelAgentPath);
         } else {
-            LogUtil.log(project, "Your jrebel agentpath is not exist, HotSwap is disabled now; You should install the Jrebel Idea Plugin or set the Jrebel agentpath on the Gyro Settings Page[Preferences->Tools->Gyro Settings]");
+            LogUtil.warning(project, "Your Jrebel agentpath is not exist; Jrebel HotSwap is unsupported now; You should install the Jrebel Idea Plugin or set the Jrebel agentpath on the Gyro Settings Page[Preferences->Tools->Gyro Settings]");
         }
         return wasRun;
     }
@@ -69,7 +70,7 @@ public class GyroDebuggerRunner extends GenericDebuggerRunner {
                 return super.doExecute(state, env);
             }
         } catch (IOException | ExecutionException e) {
-            LogUtil.log(env.getProject(), "some errors happened, please restart");
+            LogUtil.error(env.getProject(), "some errors happened, please restart");
             throw new RuntimeException(e);
         }
     }
@@ -88,7 +89,7 @@ public class GyroDebuggerRunner extends GenericDebuggerRunner {
                 return super.doExecuteAsync(state, env);
             }
         } catch (IOException | ExecutionException e) {
-            LogUtil.log(env.getProject(), "some errors happened, please restart");
+            LogUtil.error(env.getProject(), "some errors happened, please restart");
             throw new RuntimeException(e);
         }
     }
