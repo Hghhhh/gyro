@@ -10,7 +10,8 @@ https://plugins.jetbrains.com/plugin/20795-gyro
 认准Gyro Debug的黄色小蜜蜂，无需你为此改动任何代码，用它来执行你的单测，你将开启一段美妙的体验。
 
 视频演示：
-https://youtu.be/2Kl0yGgz5f0
+youtu：https://youtu.be/2Kl0yGgz5f0
+bilibili：https://www.bilibili.com/video/BV1DR4y1a7pq/
 
 # 原理
 **原理其实就一句话：想办法复用第一次启动的进程。**
