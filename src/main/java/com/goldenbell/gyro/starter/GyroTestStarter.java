@@ -12,8 +12,14 @@ import java.nio.file.*;
 import java.security.Permission;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 public class GyroTestStarter {
+
+    private static final Executor TEST_RUNNER_EXECUTOR = new ThreadPoolExecutor(1, 20, 30, TimeUnit.SECONDS, new ArrayBlockingQueue<>(3), new ThreadPoolExecutor.CallerRunsPolicy());
 
     public static void main(String[] args) {
         log("########################[GYRO RUNNING]########################");
@@ -45,17 +51,25 @@ public class GyroTestStarter {
         try {
             watchService = FileSystems.getDefault().newWatchService();
             path.register(watchService, new WatchEvent.Kind[] {StandardWatchEventKinds.ENTRY_MODIFY}, SensitivityWatchEventModifier.HIGH);
+            int emptyRunTime = 0;
             while (true) {
                 WatchKey watchKey = watchService.take();
                 Iterator events = watchKey.pollEvents().iterator();
-
+                if (!events.hasNext() && emptyRunTime <= 10000) {
+                    emptyRunTime ++;
+                }
                 while(events.hasNext()) {
+                    emptyRunTime = 0;
                     events.next();
                     String[] params = Files.readAllLines(file.toPath(), StandardCharsets.UTF_8)
                             .stream().filter((line) -> line!=null && !line.isEmpty()).toArray(String[]::new);
-                    start(className, params);
+                    TEST_RUNNER_EXECUTOR.execute(() -> start(className, params));
                 }
                 watchKey.reset();
+                if (emptyRunTime > 500) {
+                    // min sleep 0.5s and max sleep 10s
+                    Thread.sleep(emptyRunTime);
+                }
             }
         } catch (Throwable e) {
             throw new RuntimeException(e);
