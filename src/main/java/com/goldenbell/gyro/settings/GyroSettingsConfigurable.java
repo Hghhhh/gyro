@@ -30,6 +30,9 @@ public class GyroSettingsConfigurable implements Configurable {
     @Override
     public boolean isModified() {
         GyroSettingsState settingState = GyroSettingsState.getInstance();
+        if (gyroSettingComponent == null) {
+            return false;
+        }
         return !gyroSettingComponent.getJrebelAgentPathText().equals(settingState.getJrebelAgentPath());
     }
 
