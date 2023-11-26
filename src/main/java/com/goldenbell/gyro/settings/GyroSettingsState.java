@@ -28,7 +28,13 @@ public class GyroSettingsState implements PersistentStateComponent<GyroSettingsS
         jrebelAgentPathBuilder.append(File.separator);
         jrebelAgentPathBuilder.append("lib");
         jrebelAgentPathBuilder.append(File.separator);
-        jrebelAgentPathBuilder.append("libjrebel64.dylib");
+
+        String osName = System.getProperty("os.name");
+        if (osName != null && osName.contains("Windows")) {
+            jrebelAgentPathBuilder.append("jrebel64.dll");
+        } else {
+            jrebelAgentPathBuilder.append("libjrebel64.dylib");
+        }
         jrebelAgentPath = jrebelAgentPathBuilder.toString();
     }
 
